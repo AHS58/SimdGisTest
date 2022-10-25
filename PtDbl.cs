@@ -17,6 +17,10 @@ namespace SimdGisTest
             X = x;
             Y = y;
         }
+        public override string ToString()
+        {
+            return $"X:{X} Y:{Y}";
+        }
 
         //***
         public static PtDbl[] GetRandomPointArray(int count)

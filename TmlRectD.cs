@@ -70,18 +70,17 @@
             }
             return new TmlRectD(Left, Top, Right - Left, Bottom - Top);
         }
-        public static TmlRectD GetBoundingBox(IList<PtDbl> pts, int start, int end)
+
+
+
+        public static TmlRectD GetBoundingBox(IList<PtFlt> pts)
         {
-            double Left = pts[start].X;
-            double Right = pts[start].X;
-            double Top = pts[start].Y;
-            double Bottom = pts[start].Y;
+            float Left = pts[0].X;
+            float Right = pts[0].X;
+            float Top = pts[0].Y;
+            float Bottom = pts[0].Y;
 
-            start++;
-            end++;
-            if (end > pts.Count - 1) end = pts.Count - 1;
-
-            for (int i = start; i < end; i++)
+            for (int i = 1; i < pts.Count; i++)
             {
                 Left = Math.Min(pts[i].X, Left);
                 Right = Math.Max(pts[i].X, Right);
@@ -90,7 +89,6 @@
             }
             return new TmlRectD(Left, Top, Right - Left, Bottom - Top);
         }
-
 
     }
 }

@@ -49,5 +49,47 @@ namespace SimdGisTest
 
         }
 
+        public static TmlRectD GetBoundingBoxSIMD256(PtFlt[] pts)
+        {
+            //if (!Avx.IsSupported || pts.Length < 4)
+            //{
+            //    return TmlRectD.GetBoundingBox(pts);
+            //}
+            if ( pts.Length < 4) return TmlRectD.GetBoundingBox(pts);
+           
+            int Remainder = pts.Length % 4;//8 float 4 point
+
+            ReadOnlySpan<PtFlt> bs = pts;
+            ReadOnlySpan<Vector256<float>> vecDz = MemoryMarshal.Cast<PtFlt, Vector256<float>>(bs[..(pts.Length - Remainder)]);
+
+            var vmin = Vector256.Create(pts[0].X, pts[0].Y, pts[1].X, pts[1].Y, pts[2].X, pts[2].Y, pts[3].X, pts[3].Y);
+            var vmax = Vector256.Create(pts[0].X, pts[0].Y, pts[1].X, pts[1].Y, pts[2].X, pts[2].Y, pts[3].X, pts[3].Y);
+
+            for (int i = 1; i < vecDz.Length; i++)
+            {
+                vmin = Avx.Min(vecDz[i], vmin);
+                vmax = Avx.Max(vecDz[i], vmax);
+            }
+            float minX = vmin.GetElement(0), minY = vmin.GetElement(1);
+            float maxX = vmax.GetElement(0), maxY = vmax.GetElement(1);
+            for (int i = 2; i < 7; i += 2)//2,4,6
+            {
+                minX = Math.Min(vmin.GetElement(i), minX);
+                minY = Math.Min(vmin.GetElement(i + 1), minY);
+                maxX = Math.Max(vmax.GetElement(i), maxX);
+                maxY = Math.Max(vmax.GetElement(i + 1), maxY);
+            }
+            for (int i = pts.Length-Remainder; i < pts.Length; i++)//Remain
+            {
+                minX = Math.Min(bs[i].X, minX);
+                minY = Math.Min(bs[i].Y, minY);
+                maxX = Math.Max(bs[i].X, maxX);
+                maxY = Math.Max(bs[i].Y, maxY);
+            }
+
+            return new TmlRectD(minX, minY, maxX - minX, maxY - minY);
+
+        }
+
     }
 }
