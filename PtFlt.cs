@@ -24,7 +24,7 @@ namespace SimdGisTest
 
             for (int i = 0; i < count; i++)
             {
-                int sd = r.Next(0, 180);
+                int sd = r.Next(1, 180);
                 result[i] = new(r.NextSingle() * sd, r.NextSingle() * sd);
             }
 

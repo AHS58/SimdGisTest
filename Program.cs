@@ -8,9 +8,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        PtDbl[] dz = PtDbl.GetRandomPointArray(10000);
-
-        if (!Avx.IsSupported || dz.Length < 2)
+        if (!Avx.IsSupported )
         {
             Console.WriteLine("not supported");
             return;
@@ -18,10 +16,20 @@ internal class Program
         TmlRectD testD = GisIntrinsic.GetBoundingBoxSIMD256(new PtDbl[] { new(1, 1), new(0, 0) });
         TmlRectD testF = GisIntrinsic.GetBoundingBoxSIMD256(new PtFlt[] { new(1, 1), new(0, 0), new(1, 1), new(0, 0) });
 
+        tstDbl();
+        tstFlt();
+      
+    }
+    static void tstDbl()
+    {
+        PtDbl[] dz = PtDbl.GetRandomPointArray(100_000);
+        if ( dz.Length < 2) return;
+      
         Stopwatch sw = Stopwatch.StartNew();
 
         TmlRectD bboxSIMD = GisIntrinsic.GetBoundingBoxSIMD256(dz);
         sw.Stop();
+        var swe = sw.Elapsed;
 
         Console.WriteLine(bboxSIMD.ToStringTwoSH() + " SimdDouble:" + sw.Elapsed);
 
@@ -29,25 +37,29 @@ internal class Program
         TmlRectD bbox = TmlRectD.GetBoundingBox(dz);
         sw.Stop();
 
-        Console.WriteLine(bbox.ToStringTwoSH() + " LoopDouble:" + sw.Elapsed);
+        Console.WriteLine(bbox.ToStringTwoSH() + " LoopDouble:" + sw.Elapsed + " s/l=" + sw.Elapsed / swe);
         Console.WriteLine("---------------------------------------------------");
-        //float****
+    }
+    static void tstFlt()
+    {
+        //PtFlt[] dzf = PtFlt.GetRandomPointArray(12);
+        PtFlt[] dzf = PtFlt.GetRandomPointArray(100_000);
+        if ( dzf.Length < 4)return;
 
+       
+        Stopwatch sw = Stopwatch.StartNew();
 
-        PtFlt[] dzf = PtFlt.GetRandomPointArray(10000);     
-
-        sw.Restart();
         TmlRectD bboxSIMDf = GisIntrinsic.GetBoundingBoxSIMD256(dzf);
         sw.Stop();
+        var swe = sw.Elapsed;
 
-        Console.WriteLine(bboxSIMDf.ToStringTwoSH()+" SimdFloat:" + sw.Elapsed);
+        Console.WriteLine(bboxSIMDf.ToStringTwoSH() + " SimdFloat:" + sw.Elapsed);
 
         sw.Restart();
         TmlRectD bboxf = TmlRectD.GetBoundingBox(dzf);
         sw.Stop();
 
-        Console.WriteLine(bboxf.ToStringTwoSH()+" LoopFloat:" + sw.Elapsed);
+        Console.WriteLine(bboxf.ToStringTwoSH() + " LoopFloat:" + sw.Elapsed + " s/l=" + sw.Elapsed / swe);
         Console.WriteLine();
-
     }
 }

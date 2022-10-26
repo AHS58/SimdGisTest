@@ -17,11 +17,8 @@ namespace SimdGisTest
             //{
             //    return TmlRectD.GetBoundingBox(pts);
             //}
-
-            int Remainder = pts.Length % 2;
-
-            ReadOnlySpan<PtDbl> bs = pts;
-            ReadOnlySpan<Vector256<double>> vecDz = MemoryMarshal.Cast<PtDbl, Vector256<double>>(bs[..(pts.Length - Remainder)]);
+         
+            ReadOnlySpan<Vector256<double>> vecDz = MemoryMarshal.Cast<PtDbl, Vector256<double>>(pts);
 
             var vmin = Vector256.Create(pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
             var vmax = Vector256.Create(pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
@@ -55,12 +52,11 @@ namespace SimdGisTest
             //{
             //    return TmlRectD.GetBoundingBox(pts);
             //}
-            if ( pts.Length < 4) return TmlRectD.GetBoundingBox(pts);
-           
+            if (pts.Length < 4) return TmlRectD.GetBoundingBox(pts);
+
             int Remainder = pts.Length % 4;//8 float 4 point
 
-            ReadOnlySpan<PtFlt> bs = pts;
-            ReadOnlySpan<Vector256<float>> vecDz = MemoryMarshal.Cast<PtFlt, Vector256<float>>(bs[..(pts.Length - Remainder)]);
+            ReadOnlySpan<Vector256<float>> vecDz = MemoryMarshal.Cast<PtFlt, Vector256<float>>(pts);
 
             var vmin = Vector256.Create(pts[0].X, pts[0].Y, pts[1].X, pts[1].Y, pts[2].X, pts[2].Y, pts[3].X, pts[3].Y);
             var vmax = Vector256.Create(pts[0].X, pts[0].Y, pts[1].X, pts[1].Y, pts[2].X, pts[2].Y, pts[3].X, pts[3].Y);
@@ -81,15 +77,16 @@ namespace SimdGisTest
             }
             for (int i = pts.Length-Remainder; i < pts.Length; i++)//Remain
             {
-                minX = Math.Min(bs[i].X, minX);
-                minY = Math.Min(bs[i].Y, minY);
-                maxX = Math.Max(bs[i].X, maxX);
-                maxY = Math.Max(bs[i].Y, maxY);
+                minX = Math.Min(pts[i].X, minX);
+                minY = Math.Min(pts[i].Y, minY);
+                maxX = Math.Max(pts[i].X, maxX);
+                maxY = Math.Max(pts[i].Y, maxY);
             }
 
             return new TmlRectD(minX, minY, maxX - minX, maxY - minY);
 
         }
+     
 
     }
 }
